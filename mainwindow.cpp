@@ -7,9 +7,12 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    process = new QProcess(this);
-    connect(process, SIGNAL(readyReadStandardOutput()), SLOT(slotReadReady()));
-    connect(process, SIGNAL(started()), SLOT(slotReadyToWrite()));
+    server_process = new QProcess(this);
+    server_process->start("RHVoice-service");
+
+    client_process = new QProcess(this);
+    connect(client_process, SIGNAL(readyReadStandardOutput()), SLOT(slotReadReady()));
+    connect(client_process, SIGNAL(started()), SLOT(slotReadyToWrite()));
 
     QAudioFormat format;
     format.setSampleRate(24000);
@@ -33,12 +36,16 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
+    server_process->kill();
+    client_process->kill();
+    audio->stop();
+
     delete ui;
 }
 
 void MainWindow::on_cmd_speak_clicked()
 {
-    process->start(
+    client_process->start(
         "RHVoice-client",
         QStringList({"-s", "Elena"}),
         QIODevice::ReadWrite | QIODevice::Unbuffered
@@ -47,14 +54,14 @@ void MainWindow::on_cmd_speak_clicked()
 
 void MainWindow::slotReadReady()
 {
-    audio->start(process);
+    audio->start(client_process);
     audio->setVolume(0.0);
 }
 
 void MainWindow::slotReadyToWrite()
 {
-    process->write(ui->txt_text->toPlainText().toUtf8().data());
-    process->closeWriteChannel();
+    client_process->write(ui->txt_text->toPlainText().toUtf8().data());
+    client_process->closeWriteChannel();
 }
 
 void MainWindow::slotRestoreVolume()

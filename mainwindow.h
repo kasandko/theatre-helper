@@ -27,7 +27,8 @@ private slots:
 private:
     Ui::MainWindow *ui;
 
-    QProcess* process;
+    QProcess* client_process;
+    QProcess* server_process;
     QAudioOutput* audio;
 };
 

@@ -12,18 +12,18 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(process, SIGNAL(started()), SLOT(slotReadyToWrite()));
 
     QAudioFormat format;
-   format.setSampleRate(96000);
-   format.setChannelCount(1);
-   format.setSampleSize(8);
-   format.setCodec("audio/pcm");
-   format.setByteOrder(QAudioFormat::LittleEndian);
-   format.setSampleType(QAudioFormat::UnSignedInt);
+    format.setSampleRate(24000);
+    format.setChannelCount(1);
+    format.setSampleSize(16);
+    format.setCodec("audio/pcm");
+    format.setByteOrder(QAudioFormat::LittleEndian);
+    format.setSampleType(QAudioFormat::SignedInt);
 
-   QAudioDeviceInfo info(QAudioDeviceInfo::defaultOutputDevice());
-   if (!info.isFormatSupported(format)) {
-       qWarning("Raw audio format not supported by backend, cannot play audio.");
-       return;
-   }
+    QAudioDeviceInfo info(QAudioDeviceInfo::defaultOutputDevice());
+    if (!info.isFormatSupported(format)) {
+        qWarning("Raw audio format not supported by backend, cannot play audio.");
+        return;
+    }
 
     audio = new QAudioOutput(format, this);
     connect(audio, SIGNAL(stateChanged(QAudio::State)), SLOT(handleStateChanged(QAudio::State)));

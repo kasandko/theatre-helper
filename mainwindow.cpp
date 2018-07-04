@@ -26,7 +26,9 @@ MainWindow::MainWindow(QWidget *parent) :
     }
 
     audio = new QAudioOutput(format, this);
+    audio->setNotifyInterval(1);
     connect(audio, SIGNAL(stateChanged(QAudio::State)), SLOT(handleStateChanged(QAudio::State)));
+    connect(audio, SIGNAL(notify()), SLOT(slotRestoreVolume()));
 }
 
 MainWindow::~MainWindow()
@@ -46,12 +48,18 @@ void MainWindow::on_cmd_speak_clicked()
 void MainWindow::slotReadReady()
 {
     audio->start(process);
+    audio->setVolume(0.0);
 }
 
 void MainWindow::slotReadyToWrite()
 {
     process->write(ui->txt_text->toPlainText().toUtf8().data());
     process->closeWriteChannel();
+}
+
+void MainWindow::slotRestoreVolume()
+{
+    audio->setVolume(1.0);
 }
 
 void MainWindow::handleStateChanged(QAudio::State newState)

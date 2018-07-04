@@ -21,6 +21,7 @@ private slots:
     void on_cmd_speak_clicked();
     void slotReadReady();
     void slotReadyToWrite();
+    void slotRestoreVolume();
     void handleStateChanged(QAudio::State newState);
 
 private:
@@ -28,7 +29,6 @@ private:
 
     QProcess* process;
     QAudioOutput* audio;
-
 };
 
 #endif // MAINWINDOW_H

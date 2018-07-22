@@ -141,3 +141,8 @@ void MainWindow::openFile()
 
     file.close();
 }
+
+void MainWindow::on_cmd_reset_clicked()
+{
+    openFile();
+}

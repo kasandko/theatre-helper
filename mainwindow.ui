@@ -56,6 +56,13 @@
      </layout>
     </item>
     <item>
+     <widget class="QPushButton" name="cmd_reset">
+      <property name="text">
+       <string>Сброс</string>
+      </property>
+     </widget>
+    </item>
+    <item>
      <widget class="QPushButton" name="cmd_next">
       <property name="minimumSize">
        <size>

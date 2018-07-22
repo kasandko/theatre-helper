@@ -28,6 +28,8 @@ private slots:
 
     void on_cmd_select_file_clicked();
 
+    void on_cmd_reset_clicked();
+
 protected:
     void openFile();
 

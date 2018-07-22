@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QAudioOutput>
 #include <QProcess>
+#include <QList>
 
 namespace Ui {
 class MainWindow;
@@ -18,11 +19,17 @@ public:
     ~MainWindow();
 
 private slots:
-    void on_cmd_speak_clicked();
     void slotReadReady();
     void slotReadyToWrite();
     void slotRestoreVolume();
     void handleStateChanged(QAudio::State newState);
+
+    void on_cmd_next_clicked();
+
+    void on_cmd_select_file_clicked();
+
+protected:
+    void openFile();
 
 private:
     Ui::MainWindow *ui;
@@ -30,6 +37,8 @@ private:
     QProcess* client_process;
     QProcess* server_process;
     QAudioOutput* audio;
+
+    QList<QString> text;
 };
 
 #endif // MAINWINDOW_H

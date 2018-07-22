@@ -1,6 +1,10 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+#include <QFile>
+#include <QTextStream>
+#include <QFileDialog>
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -43,15 +47,6 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::on_cmd_speak_clicked()
-{
-    client_process->start(
-        "RHVoice-client",
-        QStringList({"-s", "Elena"}),
-        QIODevice::ReadWrite | QIODevice::Unbuffered
-        );
-}
-
 void MainWindow::slotReadReady()
 {
     audio->start(client_process);
@@ -60,7 +55,9 @@ void MainWindow::slotReadReady()
 
 void MainWindow::slotReadyToWrite()
 {
-    client_process->write(ui->txt_text->toPlainText().toUtf8().data());
+    QString str = text.first();
+    text.pop_front();
+    client_process->write(str.toUtf8().data());
     client_process->closeWriteChannel();
 }
 
@@ -79,10 +76,68 @@ void MainWindow::handleStateChanged(QAudio::State newState)
     case QAudio::StoppedState:
         if (audio->error() != QAudio::NoError) {
              qWarning("Cannot play audio.");
-        }
+        } 
+        ui->cmd_next->setEnabled(true);
         break;
 
     default:
         break;
     }
+}
+
+void MainWindow::on_cmd_next_clicked()
+{
+    if (text.empty())
+        openFile();
+
+    if (text.empty())
+        return;
+
+    client_process->start(
+        "RHVoice-client",
+        QStringList({"-s", "Elena"}),
+        QIODevice::ReadWrite | QIODevice::Unbuffered
+        );
+
+    ui->cmd_next->setEnabled(false);
+}
+
+void MainWindow::on_cmd_select_file_clicked()
+{
+    QString str_file = QFileDialog::getOpenFileName(ui->cmd_select_file);
+    if (str_file.count() == 0)
+        return;
+
+    ui->txt_file->setText(str_file);
+}
+
+void MainWindow::openFile()
+{
+    QString file_path = ui->txt_file->text();
+    if (file_path.count() == 0)
+        return;
+
+    QFile file;
+    file.setFileName(file_path);
+    file.open(QIODevice::ReadOnly);
+    text.clear();
+
+    if (!file.exists())
+        return;
+
+    QTextStream text_stream(&file);
+    while (!text_stream.atEnd())
+        text.append(text_stream.readLine());
+
+    if (text_stream.status() == QTextStream::Ok)
+    {
+        ui->lbl_openned_file->setText(file_path);
+        ui->cmd_next->setEnabled(true);
+    }
+    else
+    {
+        ui->cmd_next->setEnabled(false);
+    }
+
+    file.close();
 }

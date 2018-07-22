@@ -5,6 +5,7 @@
 #include <QAudioOutput>
 #include <QProcess>
 #include <QList>
+#include <QString>
 
 namespace Ui {
 class MainWindow;
@@ -32,6 +33,8 @@ private slots:
 
 protected:
     void openFile();
+    QString toStr(float value);
+
 
 private:
     Ui::MainWindow *ui;

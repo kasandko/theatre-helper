@@ -4,6 +4,8 @@
 #include <QFile>
 #include <QTextStream>
 #include <QFileDialog>
+#include <fmt/format.h>
+#include <QDebug>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -93,9 +95,24 @@ void MainWindow::on_cmd_next_clicked()
     if (text.empty())
         return;
 
+    float volume = ui->sld_volume->value() / 100.0f;
+    float rate = ui->sld_rate->value() / 100.0f;
+    float pitch = ui->sld_pitch->value() / 100.0f;
+
+    QStringList parameters({
+        "-s",
+        "Elena",
+        "-v",
+        toStr(volume),
+        "-r",
+        toStr(rate),
+        "-p",
+        toStr(pitch)
+   });
+
     client_process->start(
         "RHVoice-client",
-        QStringList({"-s", "Elena"}),
+        parameters,
         QIODevice::ReadWrite | QIODevice::Unbuffered
         );
 
@@ -140,6 +157,14 @@ void MainWindow::openFile()
     }
 
     file.close();
+}
+
+QString MainWindow::toStr(float value)
+{
+    const std::string FLOAT_PATTERN = "{0:.2f}";
+
+    QString formated = QString::fromStdString(fmt::format(FLOAT_PATTERN, value));
+    return formated.replace(",", ".");
 }
 
 void MainWindow::on_cmd_reset_clicked()
